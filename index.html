@@ -93,10 +93,10 @@
         <!-- Nav tabs -->
         <ul class="nav nav-tabs mb-4" id="mainTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="mixes-tab" data-bs-toggle="tab" data-bs-target="#mixes-pane" type="button" role="tab"><i class="fa-solid fa-list-ol me-2"></i>Tracklist par Mix</button>
+                <button class="nav-link active" id="mixes-tab" data-bs-toggle="tab" data-bs-target="#mixes-pane" type="button" role="tab"><i class="fa-solid fa-list-ol me-2"></i>All Tracklists</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="artist-tab" data-bs-toggle="tab" data-bs-target="#artist-pane" type="button" role="tab"><i class="fa-solid fa-user-check me-2"></i>Recherche par Artiste</button>
+                <button class="nav-link" id="artist-tab" data-bs-toggle="tab" data-bs-target="#artist-pane" type="button" role="tab"><i class="fa-solid fa-user-check me-2"></i>Search by Artist</button>
             </li>
         </ul>
 
@@ -118,7 +118,7 @@
                         <div class="card card-custom p-4">
                             <div class="d-flex justify-content-between align-items-center mb-3 border-bottom border-secondary pb-2">
                                 <h4 id="mix-title-display" class="m-0 text-primary">Sélectionnez un mix</h4>
-                                <button class="btn btn-outline-light btn-sm" id="btn-copy" onclick="copyTracklist()"><i class="fa-regular fa-copy me-1"></i>Copier la tracklist</button>
+                                <button class="btn btn-outline-light btn-sm" id="btn-copy" onclick="copyTracklist()"><i class="fa-regular fa-copy me-1"></i>Copy tracklist</button>
                             </div>
                             <div id="tracklist-container">
                                 <p class="text-muted">Veuillez choisir un mix dans le menu de gauche pour afficher les morceaux.</p>
@@ -161,7 +161,7 @@
                 .then(csvText => {
                     parseCSV(csvText);
                     document.getElementById('status-badge').className = "badge bg-success status-badge";
-                    document.getElementById('status-badge').innerHTML = `<i class="fa-solid fa-check me-1"></i>Base chargée (${Object.keys(mixMap).length} mixes)`;
+                    document.getElementById('status-badge').innerHTML = `<i class="fa-solid fa-check me-1"></i>Database loaded (${Object.keys(mixMap).length} mixes)`;
                 })
                 .catch(err => {
                     document.getElementById('status-badge').className = "badge bg-danger status-badge";

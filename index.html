@@ -21,10 +21,18 @@
             border: 1px solid #333;
             border-radius: 10px;
         }
+        /* Correction de la lisibilité des labels et des inputs */
+        .form-label {
+            color: #ffffff !important;
+        }
         .form-control, .form-select {
             background-color: #2a2a2a;
             border: 1px solid #444;
-            color: #fff;
+            color: #ffffff !important;
+        }
+        .form-control::placeholder {
+            color: #888888;
+            opacity: 1;
         }
         .form-control:focus, .form-select:focus {
             background-color: #333;

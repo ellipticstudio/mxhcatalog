@@ -131,18 +131,39 @@
 
         table {
             width: 100%;
+            table-layout: fixed; /* Force le tableau à respecter la largeur du conteneur */
             border-collapse: collapse;
             background: var(--card-bg);
         }
 
         th, td {
-            padding: 12px 15px;
+            padding: 10px 12px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
-            white-space: nowrap; /* Évite les retours à la ligne intempestifs */
+            overflow: hidden;
+            text-overflow: ellipsis; /* Ajoute des points de suspension (...) si le texte est trop long */
+            white-space: nowrap;     /* Évite les retours à la ligne par défaut */
         }
 
-        th {
+        /* Colonnes larges (Artist, Title, YouTube title) qui doivent prendre plus de place */
+        th:nth-child(3), td:nth-child(3), /* Artist */
+        th:nth-child(4), td:nth-child(4), /* Title */
+        th:nth-child(7), td:nth-child(7)  /* YouTube title */ {
+            white-space: normal; /* Autorise le retour à la ligne sur plusieurs lignes si besoin */
+            word-break: break-word;
+        }
+		
+		/* Ajustement ciblé des largeurs de colonnes compactes pour optimiser l'espace */
+        th:nth-child(1), td:nth-child(1) { width: 110px; }  /* ID Session */
+        th:nth-child(2), td:nth-child(2) { width: 40px; }  /* N° */
+        th:nth-child(5), td:nth-child(5) { width: 170px; white-space: normal; /* Autorise le retour à la ligne sur plusieurs lignes si besoin */
+            word-break: break-word;} /* Mix name */
+        th:nth-child(6), td:nth-child(6) { width: 170px; white-space: normal; /* Autorise le retour à la ligne sur plusieurs lignes si besoin */
+            word-break: break-word;}  /* Genre */
+        th:nth-child(8), td:nth-child(8) { width: 60px; }  /* Year */
+        th:nth-child(9), td:nth-child(9) { width: 85px; text-align: center; } /* YouTube Link */
+		
+		th {
             position: sticky;
             top: 0;
             z-index: 10;

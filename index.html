@@ -2,84 +2,218 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catalogue MXH Mixes House</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background: #121212; color: #e0e0e0; }
-        h1 { color: #fff; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #1e1e1e; }
-        th, td { padding: 12px; border: 1px solid #333; text-align: left; }
-        th { background-color: #2a2a2a; color: #ff5722; }
-        tr:hover { background-color: #252525; }
-        a { color: #4fc3f7; text-decoration: none; }
-        a:hover { text-decoration: underline; }
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --accent-color: #ff5722;
+            --text-color: #e0e0e0;
+            --border-color: #333;
+            --input-bg: #2a2a2a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        h1 {
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        input, select {
+            padding: 10px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent-color);
+        }
+
+        .stats {
+            margin-bottom: 15px;
+            font-size: 0.95em;
+            color: #888;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #252525;
+            color: var(--accent-color);
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th:hover {
+            background-color: #2c2c2c;
+        }
+
+        tr:hover {
+            background-color: #282828;
+        }
+
+        .yt-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #ff0000;
+            font-weight: bold;
+            text-decoration: none;
+            background: rgba(255, 0, 0, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            transition: background 0.2s;
+        }
+
+        .yt-link:hover {
+            background: rgba(255, 0, 0, 0.25);
+            text-decoration: none;
+        }
+
+        .no-link {
+            color: #555;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Catalogue des Mixes MXH</h1>
+    <h1>🎧 Catalogue MXH Mixes House</h1>
+
+    <!-- BARRE DE RECHERCHE ET FILTRES DE SELECTION -->
+    <div class="controls">
+        <div class="control-group">
+            <label for="search-artist">Rechercher par Artiste / Titre :</label>
+            <input type="text" id="search-artist" placeholder="Ex: Frank Klassen, Fading...">
+        </div>
+        <div class="control-group">
+            <label for="select-mix">Choix du Mix :</label>
+            <select id="select-mix">
+                <option value="">-- Tous les mixes --</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="select-genre">Genre musical :</label>
+            <select id="select-genre">
+                <option value="">-- Tous les genres --</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="stats" id="record-count">Chargement du catalogue...</div>
+
     <table id="catalog-table">
         <thead>
             <tr>
-                <th>ID Mix</th>
-                <th>Artiste</th>
-                <th>Titre</th>
-                <th>Nom du Mix</th>
-                <th>Genre</th>
-                <th>Titre YouTube</th>
+                <th onclick="sortTable(0)">ID Mix ⇕</th>
+                <th onclick="sortTable(1)">N° ⇕</th>
+                <th onclick="sortTable(2)">Artiste ⇕</th>
+                <th onclick="sortTable(3)">Titre ⇕</th>
+                <th onclick="sortTable(4)">Nom du Mix ⇕</th>
+                <th onclick="sortTable(5)">Genre ⇕</th>
+                <th onclick="sortTable(6)">Titre YouTube ⇕</th>
                 <th>Lien YouTube</th>
             </tr>
         </thead>
         <tbody>
-            <!-- Les lignes seront insérées dynamiquement ici -->
+            <!-- Lignes générées automatiquement -->
         </tbody>
     </table>
 
     <script>
-        // Fonction simple pour parser le CSV et remplir le tableau
-        async function loadCSV() {
+        let allData = [];
+
+        async function initCatalog() {
             try {
-                const response = await fetch('mixes.csv');
-                const data = await response.text();
-                const lines = data.split('\n').filter(line => line.trim() !== '');
-                
-                const tbody = document.querySelector('#catalog-table tbody');
-                tbody.innerHTML = '';
+                const response = await fetch('mixes_2.csv');
+                const text = await response.text();
+                allData = parseCSV(text);
 
-                // On saute l'en-tête (i = 1)
-                for (let i = 1; i < lines.length; i++) {
-                    // Gestion basique du CSV avec séparateur point-virgule
-                    const row = lines[i];
-                    // (Optionnel : parser les guillemets si nécessaire, ou découper simplement)
-                    const cols = parseCSVLine(row);
-                    
-                    if (cols.length >= 8) {
-                        const [id_mix, id_title, artist, title, mix_name, genre, url_id, youtube_title] = cols;
-                        
-                        const tr = document.createElement('tr');
-                        
-                        let youtubeLinkHTML = '-';
-                        if (url_id && url_id.trim() !== '') {
-                            youtubeLinkHTML = `<a href="https://www.youtube.com/watch?v=${url_id.trim()}" target="_blank">🔗 Voir sur YouTube</a>`;
-                        }
+                populateSelectFilters();
+                renderTable(allData);
 
-                        tr.innerHTML = `
-                            <td>${id_mix || ''}</td>
-                            <td>${artist || ''}</td>
-                            <td>${title || ''}</td>
-                            <td>${mix_name || ''}</td>
-                            <td>${genre || ''}</td>
-                            <td>${youtube_title || ''}</td>
-                            <td>${youtubeLinkHTML}</td>
-                        `;
-                        tbody.appendChild(tr);
-                    }
-                }
-            } catch (error) {
-                console.error("Erreur lors du chargement du fichier CSV :", error);
+                // Écouteurs d'événements pour les filtres et recherches
+                document.getElementById('search-artist').addEventListener('input', applyFilters);
+                document.getElementById('select-mix').addEventListener('change', applyFilters);
+                document.getElementById('select-genre').addEventListener('change', applyFilters);
+
+            } catch (err) {
+                console.error("Erreur lors du chargement de mixes_2.csv :", err);
+                document.getElementById('record-count').textContent = "Erreur de chargement du fichier CSV.";
             }
         }
 
-        // Utilitaire pour parser une ligne CSV gérant les guillemets
+        // Parser CSV respectant les guillemets et séparateur ';'
+        function parseCSV(csvText) {
+            const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
+            if (lines.length === 0) return [];
+
+            const headers = parseCSVLine(lines[0]);
+            const data = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = parseCSVLine(lines[i]);
+                if (values.length === headers.length) {
+                    let entry = {};
+                    headers.forEach((h, index) => {
+                        entry[h.trim()] = values[index] ? values[index].trim() : '';
+                    });
+                    data.push(entry);
+                }
+            }
+            return data;
+        }
+
         function parseCSVLine(text) {
             let result = [];
             let current = '';
@@ -90,17 +224,110 @@
                 if (char === '"') {
                     inQuotes = !inQuotes;
                 } else if (char === ';' && !inQuotes) {
-                    result.push(current.trim());
+                    result.push(current);
                     current = '';
                 } else {
                     current += char;
                 }
             }
-            result.push(current.trim());
+            result.push(current);
             return result.map(val => val.replace(/^"|"$/g, ''));
         }
 
-        loadCSV();
+        // Remplit dynamiquement les listes déroulantes des mixes et genres
+        function populateSelectFilters() {
+            const mixSelect = document.getElementById('select-mix');
+            const genreSelect = document.getElementById('select-genre');
+
+            const mixes = [...new Set(allData.map(d => d.id_mix || d.mix_name).filter(Boolean))].sort();
+            const genres = [...new Set(allData.map(d => d.genre).filter(Boolean))].sort();
+
+            mixes.forEach(mix => {
+                const opt = document.createElement('option');
+                opt.value = mix;
+                opt.textContent = mix;
+                mixSelect.appendChild(opt);
+            });
+
+            genres.forEach(genre => {
+                const opt = document.createElement('option');
+                opt.value = genre;
+                opt.textContent = genre;
+                genreSelect.appendChild(opt);
+            });
+        }
+
+        // Application combinée des recherches et choix
+        function applyFilters() {
+            const searchValue = document.getElementById('search-artist').value.toLowerCase();
+            const selectedMix = document.getElementById('select-mix').value;
+            const selectedGenre = document.getElementById('select-genre').value;
+
+            const filtered = allData.filter(item => {
+                const matchesSearch = (item.artist || '').toLowerCase().includes(searchValue) ||
+                                      (item.title || '').toLowerCase().includes(searchValue) ||
+                                      (item.youtube_title || '').toLowerCase().includes(searchValue);
+
+                const matchesMix = !selectedMix || item.id_mix === selectedMix || item.mix_name === selectedMix;
+                const matchesGenre = !selectedGenre || item.genre === selectedGenre;
+
+                return matchesSearch && matchesMix && matchesGenre;
+            });
+
+            renderTable(filtered);
+        }
+
+        // Rendu du tableau avec liens actifs vers YouTube
+        function renderTable(data) {
+            const tbody = document.querySelector('#catalog-table tbody');
+            const countDiv = document.getElementById('record-count');
+            tbody.innerHTML = '';
+
+            countDiv.textContent = `${data.length} titre(s) trouvé(s)`;
+
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+
+                let youtubeLinkHTML = '<span class="no-link">-</span>';
+                if (item.url_id && item.url_id.trim() !== '') {
+                    youtubeLinkHTML = `<a href="https://www.youtube.com/watch?v=${encodeURIComponent(item.url_id.trim())}" target="_blank" class="yt-link">▶ Voir</a>`;
+                }
+
+                tr.innerHTML = `
+                    <td><strong>${item.id_mix || ''}</strong></td>
+                    <td>${item.id_title || ''}</td>
+                    <td>${item.artist || ''}</td>
+                    <td>${item.title || ''}</td>
+                    <td>${item.mix_name || ''}</td>
+                    <td>${item.genre || ''}</td>
+                    <td>${item.youtube_title || ''}</td>
+                    <td>${youtubeLinkHTML}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Tri sur les colonnes au clic sur l'en-tête
+        let sortDirection = false;
+        function sortTable(columnIndex) {
+            const keys = ['id_mix', 'id_title', 'artist', 'title', 'mix_name', 'genre', 'youtube_title'];
+            const key = keys[columnIndex];
+
+            sortDirection = !sortDirection;
+            allData.sort((a, b) => {
+                let valA = a[key] || '';
+                let valB = b[key] || '';
+
+                if (!isNaN(valA) && !isNaN(valB) && valA !== '' && valB !== '') {
+                    return sortDirection ? valA - valB : valB - valA;
+                }
+                return sortDirection ? valA.localeCompare(valB) : valB.localeCompare(valA);
+            });
+
+            applyFilters();
+        }
+
+        window.onload = initCatalog;
     </script>
 </body>
 </html>

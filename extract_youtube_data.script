@@ -1,0 +1,56 @@
+{
+    const allLinks = Array.from(document.querySelectorAll('a[href*="watch?v="], a[href*="/video/"]'));
+    const map = new Map();
+
+    allLinks.forEach(a => {
+        const href = a.href || '';
+        const match = href.match(/(?:v=|\/embed\/|\/v\/|\/vi\/|\/video\/)([a-zA-Z0-9_-]{11})/);
+        
+        if (match) {
+            const urlId = match[1];
+
+            if (!map.has(urlId)) {
+                const container = a.closest('ytcp-video-row, ytd-rich-item-renderer, ytd-grid-video-renderer, ytd-video-renderer') || a.parentElement;
+
+                let title = '';
+
+                if (container) {
+                    const titleEl = container.querySelector('#video-title, #video-title-link, .video-title');
+                    if (titleEl) {
+                        title = (titleEl.innerText || titleEl.textContent || titleEl.getAttribute('title') || '').trim();
+                    } else {
+                        const lines = (container.innerText || '').split('\n').map(l => l.trim()).filter(Boolean);
+                        title = lines.find(l => /Session|MXH|Mix|Track/i.test(l)) || lines[0] || '';
+                    }
+                }
+
+                if (!title) {
+                    title = a.getAttribute('title') || a.getAttribute('aria-label') || a.innerText || '';
+                }
+
+                // Nettoyage : retire la durée si elle est collée au début (ex: "1:00:01 ")
+                title = title.replace(/^\d{1,2}:\d{2}(?::\d{2})?\s*/, '').trim();
+
+                if (title && title.length > 3 && !/^\d{1,2}:\d{2}(?::\d{2})?$/.test(title)) {
+                    map.set(urlId, title);
+                }
+            }
+        }
+    });
+
+    const results = [];
+    map.forEach((title, urlId) => {
+        results.push(`${urlId};"${title.replace(/"/g, '""')}"`);
+    });
+
+    if (results.length === 0) {
+        console.warn("⚠️ Aucun titre trouvé.");
+    } else {
+        const csvOutput = "url_id;youtube_title\n" + results.join('\n');
+        console.log(csvOutput);
+        
+        navigator.clipboard.writeText(csvOutput).then(() => {
+            console.log(`✅ Succès ! ${results.length} vidéos extraites (url_id et youtube_title).`);
+        });
+    }
+}

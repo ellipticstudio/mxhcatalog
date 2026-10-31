@@ -14,6 +14,7 @@
             --input-bg: #2a2a2a;
         }
 
+        /* --- STYLES DESKTOP (Par défaut) --- */
         html, body {
             height: 100%;
             margin: 0;
@@ -36,6 +37,7 @@
             margin: 0 0 15px 0;
             padding: 0;
             flex-shrink: 0;
+            font-size: 1.8em;
         }
 
         .controls {
@@ -72,13 +74,13 @@
             color: #fff;
             border-radius: 4px;
             outline: none;
+            box-sizing: border-box;
         }
 
         input:focus, select:focus {
             border-color: var(--accent-color);
         }
 
-        /* Style du bouton Reset */
         .btn-reset {
             padding: 10px 16px;
             background: #2a2a2a;
@@ -88,7 +90,7 @@
             cursor: pointer;
             font-weight: 600;
             transition: all 0.2s;
-            height: 41px; /* Aligné avec les inputs/selects */
+            height: 41px;
         }
 
         .btn-reset:hover {
@@ -121,6 +123,7 @@
         .table-container {
             flex-grow: 1;
             overflow-y: auto;
+            overflow-x: auto; /* Permet le défilement horizontal du tableau sur mobile */
             border-radius: 8px;
             border: 1px solid var(--border-color);
             background: var(--card-bg);
@@ -136,6 +139,7 @@
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
+            white-space: nowrap; /* Évite les retours à la ligne intempestifs */
         }
 
         th {
@@ -180,6 +184,53 @@
         .no-link {
             color: #555;
             font-style: italic;
+        }
+
+        /* --- ADAPTATION MOBILITY / SMARTPHONE --- */
+        @media (max-width: 768px) {
+            html, body {
+                height: auto;
+                overflow: visible; /* Défilement naturel de la page */
+            }
+
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.4em;
+                margin-bottom: 10px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .control-group {
+                min-width: 100%;
+            }
+
+            .btn-reset {
+                width: 100%;
+            }
+
+            .stats {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .table-container {
+                overflow-x: auto;
+                max-height: none; /* Le tableau s'allonge naturellement */
+            }
+
+            th {
+                position: static; /* Désactive le sticky interne du tableau sur petit écran */
+            }
         }
     </style>
 </head>

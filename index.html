@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catalogue MXH Mixes House</title>
+    <title>MXH Catalog</title>
     <style>
         :root {
             --bg-color: #121212;
@@ -128,41 +128,41 @@
 </head>
 <body>
 
-    <h1>🎧 Catalogue MXH Mixes House</h1>
+    <h1>🎧 MXH Mixes Catalog</h1>
 
     <!-- BARRE DE RECHERCHE ET FILTRES -->
     <div class="controls">
         <div class="control-group">
-            <label for="search-artist">Rechercher par Artiste / Titre :</label>
+            <label for="search-artist">Search by Artist / Title:</label>
             <input type="text" id="search-artist" placeholder="Ex: Frank Klassen, Fading...">
         </div>
         <div class="control-group">
-            <label for="select-mix">Choix du Mix :</label>
+            <label for="select-mix">Mix Selection:</label>
             <select id="select-mix">
-                <option value="">-- Tous les mixes --</option>
+                <option value="">-- All mixes --</option>
             </select>
         </div>
         <div class="control-group">
-            <label for="select-genre">Genre musical :</label>
+            <label for="select-genre">Genre:</label>
             <select id="select-genre">
-                <option value="">-- Tous les genres --</option>
+                <option value="">-- All genres --</option>
             </select>
         </div>
     </div>
 
-    <div class="stats" id="record-count">Chargement du catalogue...</div>
+    <div class="stats" id="record-count">Catalog loading...</div>
 
     <table id="catalog-table">
         <thead>
             <tr>
                 <th onclick="sortTable(0)">ID Mix ⇕</th>
                 <th onclick="sortTable(1)">N° ⇕</th>
-                <th onclick="sortTable(2)">Artiste ⇕</th>
-                <th onclick="sortTable(3)">Titre ⇕</th>
-                <th onclick="sortTable(4)">Nom du Mix ⇕</th>
+                <th onclick="sortTable(2)">Artist ⇕</th>
+                <th onclick="sortTable(3)">Title ⇕</th>
+                <th onclick="sortTable(4)">Mix name ⇕</th>
                 <th onclick="sortTable(5)">Genre ⇕</th>
-                <th onclick="sortTable(6)">Titre YouTube ⇕</th>
-                <th>Lien YouTube</th>
+                <th onclick="sortTable(6)">YouTube title ⇕</th>
+                <th> YouTube link</th>
             </tr>
         </thead>
         <tbody>

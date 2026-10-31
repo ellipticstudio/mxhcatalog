@@ -130,7 +130,7 @@
 
     <h1>🎧 Catalogue MXH Mixes House</h1>
 
-    <!-- BARRE DE RECHERCHE ET FILTRES DE SELECTION -->
+    <!-- BARRE DE RECHERCHE ET FILTRES -->
     <div class="controls">
         <div class="control-group">
             <label for="search-artist">Rechercher par Artiste / Titre :</label>
@@ -166,7 +166,7 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Lignes générées automatiquement -->
+            <!-- Lignes générées dynamiquement -->
         </tbody>
     </table>
 
@@ -175,25 +175,27 @@
 
         async function initCatalog() {
             try {
-                const response = await fetch('mixes_2.csv');
-                const text = await response.text();
+                // Utilisation de l'objet Response avec ArrayBuffer + TextDecoder pour forcer le décodage en ISO-8859-1 (Latin-1)
+                const response = await fetch('mixes.csv');
+                const buffer = await response.arrayBuffer();
+                const decoder = new TextDecoder('iso-8859-1');
+                const text = decoder.decode(buffer);
+
                 allData = parseCSV(text);
 
                 populateSelectFilters();
                 renderTable(allData);
 
-                // Écouteurs d'événements pour les filtres et recherches
                 document.getElementById('search-artist').addEventListener('input', applyFilters);
                 document.getElementById('select-mix').addEventListener('change', applyFilters);
                 document.getElementById('select-genre').addEventListener('change', applyFilters);
 
             } catch (err) {
-                console.error("Erreur lors du chargement de mixes_2.csv :", err);
-                document.getElementById('record-count').textContent = "Erreur de chargement du fichier CSV.";
+                console.error("Erreur lors du chargement de mixes.csv :", err);
+                document.getElementById('record-count').textContent = "Erreur de chargement du fichier CSV (Vérifiez la console).";
             }
         }
 
-        // Parser CSV respectant les guillemets et séparateur ';'
         function parseCSV(csvText) {
             const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
             if (lines.length === 0) return [];
@@ -203,7 +205,7 @@
 
             for (let i = 1; i < lines.length; i++) {
                 const values = parseCSVLine(lines[i]);
-                if (values.length === headers.length) {
+                if (values.length >= headers.length) {
                     let entry = {};
                     headers.forEach((h, index) => {
                         entry[h.trim()] = values[index] ? values[index].trim() : '';
@@ -234,7 +236,6 @@
             return result.map(val => val.replace(/^"|"$/g, ''));
         }
 
-        // Remplit dynamiquement les listes déroulantes des mixes et genres
         function populateSelectFilters() {
             const mixSelect = document.getElementById('select-mix');
             const genreSelect = document.getElementById('select-genre');
@@ -257,7 +258,6 @@
             });
         }
 
-        // Application combinée des recherches et choix
         function applyFilters() {
             const searchValue = document.getElementById('search-artist').value.toLowerCase();
             const selectedMix = document.getElementById('select-mix').value;
@@ -277,7 +277,6 @@
             renderTable(filtered);
         }
 
-        // Rendu du tableau avec liens actifs vers YouTube
         function renderTable(data) {
             const tbody = document.querySelector('#catalog-table tbody');
             const countDiv = document.getElementById('record-count');
@@ -307,7 +306,6 @@
             });
         }
 
-        // Tri sur les colonnes au clic sur l'en-tête
         let sortDirection = false;
         function sortTable(columnIndex) {
             const keys = ['id_mix', 'id_title', 'artist', 'title', 'mix_name', 'genre', 'youtube_title'];

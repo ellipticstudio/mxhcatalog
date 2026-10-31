@@ -14,28 +14,42 @@
             --input-bg: #2a2a2a;
         }
 
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
             background-color: var(--bg-color);
             color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         h1 {
             color: #fff;
-            margin-bottom: 20px;
+            margin: 0 0 15px 0;
+            padding: 0;
+            flex-shrink: 0;
         }
 
         .controls {
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
-            margin-bottom: 20px;
+            align-items: flex-end;
+            margin-bottom: 15px;
             background: var(--card-bg);
             padding: 15px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
         }
 
         .control-group {
@@ -43,7 +57,7 @@
             flex-direction: column;
             gap: 5px;
             flex: 1;
-            min-width: 200px;
+            min-width: 180px;
         }
 
         label {
@@ -64,6 +78,25 @@
             border-color: var(--accent-color);
         }
 
+        /* Style du bouton Reset */
+        .btn-reset {
+            padding: 10px 16px;
+            background: #2a2a2a;
+            border: 1px solid var(--border-color);
+            color: #aaa;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            height: 41px; /* Aligné avec les inputs/selects */
+        }
+
+        .btn-reset:hover {
+            background: #3a3a3a;
+            color: #fff;
+            border-color: #555;
+        }
+
         .stats {
             display: flex;
             justify-content: space-between;
@@ -77,19 +110,26 @@
             padding: 10px 15px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
         }
 
         .stats span strong {
             color: var(--accent-color);
         }
 
+        .table-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             background: var(--card-bg);
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
         }
 
         th, td {
@@ -99,11 +139,15 @@
         }
 
         th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
             background-color: #252525;
             color: var(--accent-color);
             font-weight: 600;
             cursor: pointer;
             user-select: none;
+            box-shadow: 0 2px 2px rgba(0,0,0,0.2);
         }
 
         th:hover {
@@ -118,18 +162,18 @@
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            color: #ff0000;
-            font-weight: bold;
+            color: #ff5722;
+            font-weight: 600;
             text-decoration: none;
-            background: rgba(255, 0, 0, 0.1);
+            background: rgba(255, 87, 34, 0.1);
             padding: 4px 8px;
             border-radius: 4px;
-            border: 1px solid rgba(255, 0, 0, 0.3);
+            border: 1px solid rgba(255, 87, 34, 0.3);
             transition: background 0.2s;
         }
 
         .yt-link:hover {
-            background: rgba(255, 0, 0, 0.25);
+            background: rgba(255, 87, 34, 0.25);
             text-decoration: none;
         }
 
@@ -141,7 +185,7 @@
 </head>
 <body>
 
-    <h1>🎧 MXH Sessions Catalog - (ver. 0.1)</h1>
+    <h1>🎧 MXH Sessions Catalog - (ver. 0.2)</h1>
 
     <!-- BARRE DE RECHERCHE ET FILTRES -->
     <div class="controls">
@@ -161,31 +205,42 @@
                 <option value="">-- All genres --</option>
             </select>
         </div>
+        <div class="control-group">
+            <label for="select-year">Year:</label>
+            <select id="select-year">
+                <option value="">-- All years --</option>
+            </select>
+        </div>
+        <button class="btn-reset" onclick="resetFilters()">Reset</button>
     </div>
 
-    <!-- ZONE DE STATISTIQUES GLOBALes ET FILTRÉES -->
+    <!-- ZONE DE STATISTIQUES GLOBALES ET FILTRÉES -->
     <div class="stats">
         <div id="catalog-global-stats">Global: Chargement...</div>
         <div id="record-count">Filtered: Chargement...</div>
     </div>
 
-    <table id="catalog-table">
-        <thead>
-            <tr>
-                <th onclick="sortTable(0)">ID Session ⇕</th>
-                <th onclick="sortTable(1)">N° ⇕</th>
-                <th onclick="sortTable(2)">Artist ⇕</th>
-                <th onclick="sortTable(3)">Title ⇕</th>
-                <th onclick="sortTable(4)">Mix name ⇕</th>
-                <th onclick="sortTable(5)">Genre ⇕</th>
-                <th onclick="sortTable(6)">YouTube title ⇕</th>
-                <th>YouTube</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Lignes générées dynamiquement -->
-        </tbody>
-    </table>
+    <!-- CONTENEUR DU TABLEAU AVEC DÉFILEMENT INTERNE -->
+    <div class="table-container">
+        <table id="catalog-table">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">ID Session ⇕</th>
+                    <th onclick="sortTable(1)">N° ⇕</th>
+                    <th onclick="sortTable(2)">Artist ⇕</th>
+                    <th onclick="sortTable(3)">Title ⇕</th>
+                    <th onclick="sortTable(4)">Mix name ⇕</th>
+                    <th onclick="sortTable(5)">Genre ⇕</th>
+                    <th onclick="sortTable(6)">YouTube title ⇕</th>
+                    <th onclick="sortTable(7)">Year ⇕</th>
+                    <th>YouTube</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Lignes générées dynamiquement -->
+            </tbody>
+        </table>
+    </div>
 
     <script>
         let allData = [];
@@ -193,23 +248,39 @@
         async function initCatalog() {
             try {
                 const response = await fetch('mixes.csv');
+                if (!response.ok) throw new Error("Fichier introuvable");
+                
                 const buffer = await response.arrayBuffer();
                 const decoder = new TextDecoder('iso-8859-1');
                 const text = decoder.decode(buffer);
 
                 allData = parseCSV(text);
 
+                allData.sort((a, b) => {
+                    let mixA = a.id_mix || '';
+                    let mixB = b.id_mix || '';
+
+                    if (mixA !== mixB) {
+                        return mixB.localeCompare(mixA, undefined, { numeric: true, sensitivity: 'base' });
+                    }
+
+                    let numA = parseInt(a.id_title, 10) || 0;
+                    let numB = parseInt(b.id_title, 10) || 0;
+                    return numA - numB;
+                });
+
                 populateGlobalStats();
-                populateSelectFilters();
+                updateSelectOptions(allData);
                 renderTable(allData);
 
                 document.getElementById('search-artist').addEventListener('input', applyFilters);
                 document.getElementById('select-mix').addEventListener('change', applyFilters);
                 document.getElementById('select-genre').addEventListener('change', applyFilters);
+                document.getElementById('select-year').addEventListener('change', applyFilters);
 
             } catch (err) {
                 console.error("Erreur lors du chargement de mixes.csv :", err);
-                document.getElementById('record-count').textContent = "Erreur de chargement du fichier CSV (Vérifiez la console).";
+                document.getElementById('record-count').textContent = "Erreur de chargement. Si vous êtes en local, lancez un serveur web local.";
             }
         }
 
@@ -261,25 +332,44 @@
             return result.map(val => val.replace(/^"|"$/g, ''));
         }
 
-        function populateSelectFilters() {
+        function updateSelectOptions(currentFilteredData) {
             const mixSelect = document.getElementById('select-mix');
             const genreSelect = document.getElementById('select-genre');
+            const yearSelect = document.getElementById('select-year');
 
-            const mixes = [...new Set(allData.map(d => d.id_mix || d.mix_name).filter(Boolean))].sort();
-            const genres = [...new Set(allData.map(d => d.genre).filter(Boolean))].sort();
+            const currentMix = mixSelect.value;
+            const currentGenre = genreSelect.value;
+            const currentYear = yearSelect.value;
 
+            const mixes = [...new Set(currentFilteredData.map(d => d.id_mix || d.mix_name).filter(Boolean))].sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+            const genres = [...new Set(currentFilteredData.map(d => d.genre).filter(Boolean))].sort();
+            const years = [...new Set(currentFilteredData.map(d => d.year).filter(Boolean))].sort((a, b) => b - a);
+
+            mixSelect.innerHTML = '<option value="">-- All sessions --</option>';
             mixes.forEach(mix => {
                 const opt = document.createElement('option');
                 opt.value = mix;
                 opt.textContent = mix;
+                if (mix === currentMix) opt.selected = true;
                 mixSelect.appendChild(opt);
             });
 
+            genreSelect.innerHTML = '<option value="">-- All genres --</option>';
             genres.forEach(genre => {
                 const opt = document.createElement('option');
                 opt.value = genre;
                 opt.textContent = genre;
+                if (genre === currentGenre) opt.selected = true;
                 genreSelect.appendChild(opt);
+            });
+
+            yearSelect.innerHTML = '<option value="">-- All years --</option>';
+            years.forEach(year => {
+                const opt = document.createElement('option');
+                opt.value = year;
+                opt.textContent = year;
+                if (year === currentYear) opt.selected = true;
+                yearSelect.appendChild(opt);
             });
         }
 
@@ -287,6 +377,7 @@
             const searchValue = document.getElementById('search-artist').value.toLowerCase();
             const selectedMix = document.getElementById('select-mix').value;
             const selectedGenre = document.getElementById('select-genre').value;
+            const selectedYear = document.getElementById('select-year').value;
 
             const filtered = allData.filter(item => {
                 const matchesSearch = (item.artist || '').toLowerCase().includes(searchValue) ||
@@ -295,11 +386,83 @@
 
                 const matchesMix = !selectedMix || item.id_mix === selectedMix || item.mix_name === selectedMix;
                 const matchesGenre = !selectedGenre || item.genre === selectedGenre;
+                const matchesYear = !selectedYear || item.year === selectedYear;
 
-                return matchesSearch && matchesMix && matchesGenre;
+                return matchesSearch && matchesMix && matchesGenre && matchesYear;
             });
 
+            const filteredByMix = allData.filter(item => {
+                const s = (item.artist || '').toLowerCase().includes(searchValue) || (item.title || '').toLowerCase().includes(searchValue) || (item.youtube_title || '').toLowerCase().includes(searchValue);
+                const g = !selectedGenre || item.genre === selectedGenre;
+                const y = !selectedYear || item.year === selectedYear;
+                return s && g && y;
+            });
+
+            const filteredByGenre = allData.filter(item => {
+                const s = (item.artist || '').toLowerCase().includes(searchValue) || (item.title || '').toLowerCase().includes(searchValue) || (item.youtube_title || '').toLowerCase().includes(searchValue);
+                const m = !selectedMix || item.id_mix === selectedMix || item.mix_name === selectedMix;
+                const y = !selectedYear || item.year === selectedYear;
+                return s && m && y;
+            });
+
+            const filteredByYear = allData.filter(item => {
+                const s = (item.artist || '').toLowerCase().includes(searchValue) || (item.title || '').toLowerCase().includes(searchValue) || (item.youtube_title || '').toLowerCase().includes(searchValue);
+                const m = !selectedMix || item.id_mix === selectedMix || item.mix_name === selectedMix;
+                const g = !selectedGenre || item.genre === selectedGenre;
+                return s && m && g;
+            });
+
+            updateSpecificSelects(filteredByMix, filteredByGenre, filteredByYear);
             renderTable(filtered);
+        }
+
+        function updateSpecificSelects(dataForMix, dataForGenre, dataForYear) {
+            const mixSelect = document.getElementById('select-mix');
+            const genreSelect = document.getElementById('select-genre');
+            const yearSelect = document.getElementById('select-year');
+
+            const currentMix = mixSelect.value;
+            const currentGenre = genreSelect.value;
+            const currentYear = yearSelect.value;
+
+            const mixes = [...new Set(dataForMix.map(d => d.id_mix || d.mix_name).filter(Boolean))].sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+            mixSelect.innerHTML = '<option value="">-- All sessions --</option>';
+            mixes.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m; opt.textContent = m;
+                if (m === currentMix) opt.selected = true;
+                mixSelect.appendChild(opt);
+            });
+
+            const genres = [...new Set(dataForGenre.map(d => d.genre).filter(Boolean))].sort();
+            genreSelect.innerHTML = '<option value="">-- All genres --</option>';
+            genres.forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g; opt.textContent = g;
+                if (g === currentGenre) opt.selected = true;
+                genreSelect.appendChild(opt);
+            });
+
+            const years = [...new Set(dataForYear.map(d => d.year).filter(Boolean))].sort((a, b) => b - a);
+            yearSelect.innerHTML = '<option value="">-- All years --</option>';
+            years.forEach(y => {
+                const opt = document.createElement('option');
+                opt.value = y; opt.textContent = y;
+                if (y === currentYear) opt.selected = true;
+                yearSelect.appendChild(opt);
+            });
+        }
+
+        // Fonction de réinitialisation de tous les filtres
+        function resetFilters() {
+            document.getElementById('search-artist').value = '';
+            document.getElementById('select-mix').value = '';
+            document.getElementById('select-genre').value = '';
+            document.getElementById('select-year').value = '';
+            
+            // Remet à jour toutes les listes et réaffiche toutes les données
+            updateSelectOptions(allData);
+            renderTable(allData);
         }
 
         function renderTable(data) {
@@ -325,6 +488,7 @@
                     <td>${item.mix_name || ''}</td>
                     <td>${item.genre || ''}</td>
                     <td>${item.youtube_title || ''}</td>
+                    <td>${item.year || ''}</td>
                     <td>${youtubeLinkHTML}</td>
                 `;
                 tbody.appendChild(tr);
@@ -333,7 +497,7 @@
 
         let sortDirection = false;
         function sortTable(columnIndex) {
-            const keys = ['id_mix', 'id_title', 'artist', 'title', 'mix_name', 'genre', 'youtube_title'];
+            const keys = ['id_mix', 'id_title', 'artist', 'title', 'mix_name', 'genre', 'youtube_title', 'year'];
             const key = keys[columnIndex];
 
             sortDirection = !sortDirection;

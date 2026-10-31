@@ -179,7 +179,7 @@
                 <th onclick="sortTable(4)">Mix name ⇕</th>
                 <th onclick="sortTable(5)">Genre ⇕</th>
                 <th onclick="sortTable(6)">YouTube title ⇕</th>
-                <th> YouTube link</th>
+                <th>YouTube</th>
             </tr>
         </thead>
         <tbody>
@@ -314,7 +314,7 @@
 
                 let youtubeLinkHTML = '<span class="no-link">-</span>';
                 if (item.url_id && item.url_id.trim() !== '') {
-                    youtubeLinkHTML = `<a href="https://www.youtube.com/watch?v=${encodeURIComponent(item.url_id.trim())}" target="_blank" class="yt-link">▶ Voir</a>`;
+                    youtubeLinkHTML = `<a href="https://www.youtube.com/watch?v=${encodeURIComponent(item.url_id.trim())}" target="_blank" class="yt-link">▶ Show</a>`;
                 }
 
                 tr.innerHTML = `

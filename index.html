@@ -65,9 +65,22 @@
         }
 
         .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
             margin-bottom: 15px;
             font-size: 0.95em;
-            color: #888;
+            color: #aaa;
+            background: var(--card-bg);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stats span strong {
+            color: var(--accent-color);
         }
 
         table {
@@ -150,7 +163,11 @@
         </div>
     </div>
 
-    <div class="stats" id="record-count">Catalog loading...</div>
+    <!-- ZONE DE STATISTIQUES GLOBALes ET FILTRÉES -->
+    <div class="stats">
+        <div id="catalog-global-stats">Global: Chargement...</div>
+        <div id="record-count">Filtered: Chargement...</div>
+    </div>
 
     <table id="catalog-table">
         <thead>
@@ -175,7 +192,6 @@
 
         async function initCatalog() {
             try {
-                // Utilisation de l'objet Response avec ArrayBuffer + TextDecoder pour forcer le décodage en ISO-8859-1 (Latin-1)
                 const response = await fetch('mixes.csv');
                 const buffer = await response.arrayBuffer();
                 const decoder = new TextDecoder('iso-8859-1');
@@ -183,6 +199,7 @@
 
                 allData = parseCSV(text);
 
+                populateGlobalStats();
                 populateSelectFilters();
                 renderTable(allData);
 
@@ -194,6 +211,14 @@
                 console.error("Erreur lors du chargement de mixes.csv :", err);
                 document.getElementById('record-count').textContent = "Erreur de chargement du fichier CSV (Vérifiez la console).";
             }
+        }
+
+        function populateGlobalStats() {
+            const totalMixes = new Set(allData.map(d => d.id_mix).filter(Boolean)).size;
+            const uniqueTracks = new Set(allData.map(d => `${d.artist}|${d.title}`).filter(x => x !== '|')).size;
+            
+            const globalStatsDiv = document.getElementById('catalog-global-stats');
+            globalStatsDiv.innerHTML = `Total Mixes: <strong>${totalMixes}</strong> | Unique Tracks: <strong>${uniqueTracks}</strong>`;
         }
 
         function parseCSV(csvText) {
@@ -282,7 +307,7 @@
             const countDiv = document.getElementById('record-count');
             tbody.innerHTML = '';
 
-            countDiv.textContent = `${data.length} titre(s) trouvé(s)`;
+            countDiv.textContent = `${data.length} row(s) displayed`;
 
             data.forEach(item => {
                 const tr = document.createElement('tr');

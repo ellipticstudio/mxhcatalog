@@ -9,6 +9,7 @@
             --bg-color: #121212;
             --card-bg: #1e1e1e;
             --accent-color: #ff5722;
+            --beatport-color: #00e5ff;
             --text-color: #e0e0e0;
             --border-color: #333;
             --input-bg: #2a2a2a;
@@ -114,6 +115,9 @@
         }
 
         .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             font-size: 1.2em;
             font-weight: 600;
             color: var(--accent-color);
@@ -163,7 +167,6 @@
             flex-grow: 1;
         }
 
-        /* Format Beatport : Titre + Nom du mix sur la ligne du haut */
         .track-title-mix {
             font-weight: 600;
             color: #fff;
@@ -173,13 +176,19 @@
             text-overflow: ellipsis;
         }
 
-        /* Format Beatport : Artiste en dessous */
         .track-artist {
             color: #aaa;
             font-size: 0.95em;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .track-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
         }
 
         .track-meta {
@@ -198,11 +207,28 @@
             border: 1px solid var(--border-color);
         }
 
+        /* Session cliquable */
+        .meta-tag-clickable {
+            background: #252525;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .meta-tag-clickable:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            background: rgba(255, 87, 34, 0.1);
+        }
+
         .yt-link {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            color: #ff5722;
+            color: var(--accent-color);
             font-weight: 600;
             text-decoration: none;
             background: rgba(255, 87, 34, 0.1);
@@ -210,11 +236,28 @@
             border-radius: 4px;
             border: 1px solid rgba(255, 87, 34, 0.3);
             transition: background 0.2s;
-            flex-shrink: 0;
         }
 
         .yt-link:hover {
             background: rgba(255, 87, 34, 0.25);
+        }
+
+        .bp-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--beatport-color);
+            font-weight: 600;
+            text-decoration: none;
+            background: rgba(0, 229, 255, 0.1);
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            transition: background 0.2s;
+        }
+
+        .bp-link:hover {
+            background: rgba(0, 229, 255, 0.25);
         }
 
         .no-results {
@@ -243,21 +286,22 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
-            .track-meta {
-                width: 100%;
-                justify-content: flex-start;
-                flex-wrap: wrap;
+            .results-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
             }
-            .yt-link {
+            .track-actions {
                 width: 100%;
-                justify-content: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
             }
         }
     </style>
 </head>
 <body>
 
-    <h1>🎧 MXH Sessions Catalog - (ver. 0.6)</h1>
+    <h1>🎧 MXH Sessions Catalog - (ver. 0.8)</h1>
 
     <!-- BARRE DE RECHERCHE ET FILTRES -->
     <div class="controls">
@@ -418,6 +462,16 @@
             });
         }
 
+        // Fonction pour activer directement le filtre d'une session donnée
+        function selectSession(sessionName) {
+            // Réinitialise la recherche texte pour voir l'intégralité de la session
+            document.getElementById('search-artist').value = '';
+            document.getElementById('select-mix').value = sessionName;
+            document.getElementById('select-genre').value = '';
+            document.getElementById('select-year').value = '';
+            applyFilters();
+        }
+
         function applyFilters() {
             const searchValue = document.getElementById('search-artist').value.toLowerCase().trim();
             const selectedMix = document.getElementById('select-mix').value;
@@ -540,28 +594,46 @@
 
             const headerEl = document.createElement('div');
             headerEl.className = 'results-header';
-            headerEl.textContent = `${headerTitle} (${data.length})`;
+            
+            let headerYouTubeHTML = '';
+            if (filters.selectedMix) {
+                const firstWithUrl = data.find(i => i.url_id && i.url_id.trim() !== '');
+                if (firstWithUrl) {
+                    headerYouTubeHTML = `<a href="https://www.youtube.com/watch?v=${encodeURIComponent(firstWithUrl.url_id.trim())}" target="_blank" class="yt-link" style="font-size: 0.85em; padding: 4px 10px;">▶ Play Session on YouTube</a>`;
+                }
+            }
+
+            headerEl.innerHTML = `<span>${headerTitle} (${data.length})</span>${headerYouTubeHTML}`;
             container.appendChild(headerEl);
 
             data.forEach((item, index) => {
                 const card = document.createElement('div');
                 card.className = 'track-card';
 
-                let youtubeLinkHTML = '<span style="color:#555; font-style:italic;">-</span>';
-                if (item.url_id && item.url_id.trim() !== '') {
-                    youtubeLinkHTML = `<a href="https://www.youtube.com/watch?v=${encodeURIComponent(item.url_id.trim())}" target="_blank" class="yt-link">▶ Play on YouTube</a>`;
+                const beatportQuery = encodeURIComponent(`${item.artist || ''} ${item.title || ''}`.trim());
+                const beatportLinkHTML = `<a href="https://www.beatport.com/search?q=${beatportQuery}" target="_blank" class="bp-link">▶ Play on Beatport</a>`;
+
+                let actionsHTML = '';
+                if (filters.selectedMix) {
+                    actionsHTML = beatportLinkHTML;
+                } else {
+                    let youtubeLinkHTML = '<span style="color:#555; font-style:italic;">-</span>';
+                    if (item.url_id && item.url_id.trim() !== '') {
+                        youtubeLinkHTML = `<a href="https://www.youtube.com/watch?v=${encodeURIComponent(item.url_id.trim())}" target="_blank" class="yt-link">▶ Play on YouTube</a>`;
+                    }
+                    actionsHTML = `${youtubeLinkHTML} ${beatportLinkHTML}`;
                 }
 
-                // Format Titre + Nom du mix sur la ligne du haut, Artiste en dessous
                 const trackTitle = item.title || 'Titre inconnu';
                 const mixName = item.mix_name ? ` (${item.mix_name})` : '';
                 const displayTitleMix = `${trackTitle}${mixName}`;
                 const displayArtist = item.artist || 'Artiste inconnu';
 
-                // Condition : On n'affiche PAS la session dans les badges individuels si on filtre déjà par session
                 let metaTagsHTML = '';
+                // Badge de Session cliquable uniquement si on n'est pas déjà en mode sélection de session
                 if (!filters.selectedMix && item.id_mix) {
-                    metaTagsHTML += `<span class="meta-tag">Session: ${item.id_mix}</span>`;
+                    const sessionVal = item.id_mix;
+                    metaTagsHTML += `<span class="meta-tag-clickable" onclick="selectSession('${sessionVal}')" title="Filtrer sur cette session">Session: ${sessionVal}</span>`;
                 }
                 if (!filters.selectedGenre && item.genre) {
                     metaTagsHTML += `<span class="meta-tag">${item.genre}</span>`;
@@ -578,9 +650,11 @@
                             <div class="track-artist">${displayArtist}</div>
                         </div>
                     </div>
-                    <div class="track-meta">
-                        ${metaTagsHTML}
-                        ${youtubeLinkHTML}
+                    <div class="track-actions">
+                        <div class="track-meta">
+                            ${metaTagsHTML}
+                        </div>
+                        ${actionsHTML}
                     </div>
                 `;
                 container.appendChild(card);

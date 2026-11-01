@@ -14,20 +14,11 @@
             --input-bg: #2a2a2a;
         }
 
-        /* --- STYLES DESKTOP (Par défaut) --- */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            display: flex;
-            flex-direction: column;
+            margin: 0;
             padding: 20px;
             box-sizing: border-box;
         }
@@ -35,8 +26,6 @@
         h1 {
             color: #fff;
             margin: 0 0 15px 0;
-            padding: 0;
-            flex-shrink: 0;
             font-size: 1.8em;
         }
 
@@ -51,7 +40,6 @@
             border-radius: 8px;
             border: 1px solid var(--border-color);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            flex-shrink: 0;
         }
 
         .control-group {
@@ -105,159 +93,171 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             font-size: 0.95em;
             color: #aaa;
             background: var(--card-bg);
             padding: 10px 15px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            flex-shrink: 0;
         }
 
         .stats span strong {
             color: var(--accent-color);
         }
 
-        .table-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            overflow-x: auto; /* Permet le défilement horizontal du tableau sur mobile */
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: var(--card-bg);
+        /* --- STYLE TYPE BEATPORT TRACKLIST --- */
+        .results-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        table {
-            width: 100%;
-            table-layout: fixed; /* Force le tableau à respecter la largeur du conteneur */
-            border-collapse: collapse;
-            background: var(--card-bg);
-        }
-
-        th, td {
-            padding: 10px 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-            overflow: hidden;
-            text-overflow: ellipsis; /* Ajoute des points de suspension (...) si le texte est trop long */
-            white-space: nowrap;     /* Évite les retours à la ligne par défaut */
-        }
-
-        /* Colonnes larges (Artist, Title, YouTube title) qui doivent prendre plus de place */
-        th:nth-child(3), td:nth-child(3), /* Artist */
-        th:nth-child(4), td:nth-child(4), /* Title */
-        th:nth-child(7), td:nth-child(7)  /* YouTube title */ {
-            white-space: normal; /* Autorise le retour à la ligne sur plusieurs lignes si besoin */
-            word-break: break-word;
-        }
-		
-		/* Ajustement ciblé des largeurs de colonnes compactes pour optimiser l'espace */
-        th:nth-child(1), td:nth-child(1) { width: 110px; }  /* ID Session */
-        th:nth-child(2), td:nth-child(2) { width: 40px; }  /* N° */
-        th:nth-child(5), td:nth-child(5) { width: 170px; white-space: normal; /* Autorise le retour à la ligne sur plusieurs lignes si besoin */
-            word-break: break-word;} /* Mix name */
-        th:nth-child(6), td:nth-child(6) { width: 170px; white-space: normal; /* Autorise le retour à la ligne sur plusieurs lignes si besoin */
-            word-break: break-word;}  /* Genre */
-        th:nth-child(8), td:nth-child(8) { width: 60px; }  /* Year */
-        th:nth-child(9), td:nth-child(9) { width: 85px; text-align: center; } /* YouTube Link */
-		
-		th {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background-color: #252525;
-            color: var(--accent-color);
+        .results-header {
+            font-size: 1.2em;
             font-weight: 600;
-            cursor: pointer;
-            user-select: none;
-            box-shadow: 0 2px 2px rgba(0,0,0,0.2);
+            color: var(--accent-color);
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--border-color);
         }
 
-        th:hover {
-            background-color: #2c2c2c;
+        .track-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px 15px;
+            transition: background 0.2s, border-color 0.2s;
+            gap: 15px;
         }
 
-        tr:hover {
-            background-color: #282828;
+        .track-card:hover {
+            background: #252525;
+            border-color: #555;
+        }
+
+        .track-main {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .track-num {
+            font-weight: bold;
+            color: #777;
+            width: 25px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .track-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            min-width: 0;
+            flex-grow: 1;
+        }
+
+        /* Format Beatport : Titre + Nom du mix sur la ligne du haut */
+        .track-title-mix {
+            font-weight: 600;
+            color: #fff;
+            font-size: 1.05em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Format Beatport : Artiste en dessous */
+        .track-artist {
+            color: #aaa;
+            font-size: 0.95em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .track-meta {
+            display: flex;
+            gap: 10px;
+            color: #888;
+            font-size: 0.85em;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .meta-tag {
+            background: #252525;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
         }
 
         .yt-link {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             color: #ff5722;
             font-weight: 600;
             text-decoration: none;
             background: rgba(255, 87, 34, 0.1);
-            padding: 4px 8px;
+            padding: 6px 12px;
             border-radius: 4px;
             border: 1px solid rgba(255, 87, 34, 0.3);
             transition: background 0.2s;
+            flex-shrink: 0;
         }
 
         .yt-link:hover {
             background: rgba(255, 87, 34, 0.25);
-            text-decoration: none;
         }
 
-        .no-link {
-            color: #555;
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
             font-style: italic;
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
         }
 
-        /* --- ADAPTATION MOBILITY / SMARTPHONE --- */
+        /* Responsive Mobile */
         @media (max-width: 768px) {
-            html, body {
-                height: auto;
-                overflow: visible; /* Défilement naturel de la page */
-            }
-
-            body {
-                padding: 10px;
-            }
-
-            h1 {
-                font-size: 1.4em;
-                margin-bottom: 10px;
-            }
-
             .controls {
                 flex-direction: column;
                 align-items: stretch;
-                gap: 10px;
-                padding: 10px;
             }
-
             .control-group {
                 min-width: 100%;
             }
-
             .btn-reset {
                 width: 100%;
             }
-
-            .stats {
+            .track-card {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 5px;
             }
-
-            .table-container {
-                overflow-x: auto;
-                max-height: none; /* Le tableau s'allonge naturellement */
+            .track-meta {
+                width: 100%;
+                justify-content: flex-start;
+                flex-wrap: wrap;
             }
-
-            th {
-                position: static; /* Désactive le sticky interne du tableau sur petit écran */
+            .yt-link {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
 
-    <h1>🎧 MXH Sessions Catalog - (ver. 0.2)</h1>
+    <h1>🎧 MXH Sessions Catalog - (ver. 0.6)</h1>
 
     <!-- BARRE DE RECHERCHE ET FILTRES -->
     <div class="controls">
@@ -286,32 +286,15 @@
         <button class="btn-reset" onclick="resetFilters()">Reset</button>
     </div>
 
-    <!-- ZONE DE STATISTIQUES GLOBALES ET FILTRÉES -->
+    <!-- ZONE DE STATISTIQUES GLOBALES -->
     <div class="stats">
         <div id="catalog-global-stats">Global: Chargement...</div>
-        <div id="record-count">Filtered: Chargement...</div>
+        <div id="record-count">Sélectionnez un filtre ou lancez une recherche pour afficher les pistes</div>
     </div>
 
-    <!-- CONTENEUR DU TABLEAU AVEC DÉFILEMENT INTERNE -->
-    <div class="table-container">
-        <table id="catalog-table">
-            <thead>
-                <tr>
-                    <th onclick="sortTable(0)">ID Session ⇕</th>
-                    <th onclick="sortTable(1)">N° ⇕</th>
-                    <th onclick="sortTable(2)">Artist ⇕</th>
-                    <th onclick="sortTable(3)">Title ⇕</th>
-                    <th onclick="sortTable(4)">Mix name ⇕</th>
-                    <th onclick="sortTable(5)">Genre ⇕</th>
-                    <th onclick="sortTable(6)">YouTube title ⇕</th>
-                    <th onclick="sortTable(7)">Year ⇕</th>
-                    <th>YouTube</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Lignes générées dynamiquement -->
-            </tbody>
-        </table>
+    <!-- CONTENEUR DES RÉSULTATS -->
+    <div id="results-container" class="results-container">
+        <div class="no-results">Aucun filtre actif. Veuillez utiliser la recherche ou sélectionner une session, un genre ou une année.</div>
     </div>
 
     <script>
@@ -331,11 +314,9 @@
                 allData.sort((a, b) => {
                     let mixA = a.id_mix || '';
                     let mixB = b.id_mix || '';
-
                     if (mixA !== mixB) {
                         return mixB.localeCompare(mixA, undefined, { numeric: true, sensitivity: 'base' });
                     }
-
                     let numA = parseInt(a.id_title, 10) || 0;
                     let numB = parseInt(b.id_title, 10) || 0;
                     return numA - numB;
@@ -343,7 +324,6 @@
 
                 populateGlobalStats();
                 updateSelectOptions(allData);
-                renderTable(allData);
 
                 document.getElementById('search-artist').addEventListener('input', applyFilters);
                 document.getElementById('select-mix').addEventListener('change', applyFilters);
@@ -352,22 +332,19 @@
 
             } catch (err) {
                 console.error("Erreur lors du chargement de mixes.csv :", err);
-                document.getElementById('record-count').textContent = "Erreur de chargement. Si vous êtes en local, lancez un serveur web local.";
+                document.getElementById('record-count').textContent = "Erreur de chargement. Vérifiez votre serveur local HTTP.";
             }
         }
 
         function populateGlobalStats() {
             const totalMixes = new Set(allData.map(d => d.id_mix).filter(Boolean)).size;
             const uniqueTracks = new Set(allData.map(d => `${d.artist}|${d.title}`).filter(x => x !== '|')).size;
-            
-            const globalStatsDiv = document.getElementById('catalog-global-stats');
-            globalStatsDiv.innerHTML = `Total Mixes: <strong>${totalMixes}</strong> | Unique Tracks: <strong>${uniqueTracks}</strong>`;
+            document.getElementById('catalog-global-stats').innerHTML = `Total Mixes: <strong>${totalMixes}</strong> | Unique Tracks: <strong>${uniqueTracks}</strong>`;
         }
 
         function parseCSV(csvText) {
             const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
             if (lines.length === 0) return [];
-
             const headers = parseCSVLine(lines[0]);
             const data = [];
 
@@ -388,7 +365,6 @@
             let result = [];
             let current = '';
             let inQuotes = false;
-            
             for (let i = 0; i < text.length; i++) {
                 let char = text[i];
                 if (char === '"') {
@@ -401,7 +377,7 @@
                 }
             }
             result.push(current);
-            return result.map(val => val.replace(/^"|"$/g, ''));
+            return result.map(val => val.trim().replace(/^"(.*)"$/, '$1').replace(/""/g, '"'));
         }
 
         function updateSelectOptions(currentFilteredData) {
@@ -420,8 +396,7 @@
             mixSelect.innerHTML = '<option value="">-- All sessions --</option>';
             mixes.forEach(mix => {
                 const opt = document.createElement('option');
-                opt.value = mix;
-                opt.textContent = mix;
+                opt.value = mix; opt.textContent = mix;
                 if (mix === currentMix) opt.selected = true;
                 mixSelect.appendChild(opt);
             });
@@ -429,8 +404,7 @@
             genreSelect.innerHTML = '<option value="">-- All genres --</option>';
             genres.forEach(genre => {
                 const opt = document.createElement('option');
-                opt.value = genre;
-                opt.textContent = genre;
+                opt.value = genre; opt.textContent = genre;
                 if (genre === currentGenre) opt.selected = true;
                 genreSelect.appendChild(opt);
             });
@@ -438,21 +412,31 @@
             yearSelect.innerHTML = '<option value="">-- All years --</option>';
             years.forEach(year => {
                 const opt = document.createElement('option');
-                opt.value = year;
-                opt.textContent = year;
+                opt.value = year; opt.textContent = year;
                 if (year === currentYear) opt.selected = true;
                 yearSelect.appendChild(opt);
             });
         }
 
         function applyFilters() {
-            const searchValue = document.getElementById('search-artist').value.toLowerCase();
+            const searchValue = document.getElementById('search-artist').value.toLowerCase().trim();
             const selectedMix = document.getElementById('select-mix').value;
             const selectedGenre = document.getElementById('select-genre').value;
             const selectedYear = document.getElementById('select-year').value;
 
+            const container = document.getElementById('results-container');
+            const countDiv = document.getElementById('record-count');
+
+            if (!searchValue && !selectedMix && !selectedGenre && !selectedYear) {
+                container.innerHTML = '<div class="no-results">Aucun filtre actif. Veuillez utiliser la recherche ou sélectionner une session, un genre ou une année.</div>';
+                countDiv.textContent = 'Sélectionnez un filtre ou lancez une recherche pour afficher les pistes';
+                updateSelectOptions(allData);
+                return;
+            }
+
             const filtered = allData.filter(item => {
-                const matchesSearch = (item.artist || '').toLowerCase().includes(searchValue) ||
+                const matchesSearch = !searchValue || 
+                                      (item.artist || '').toLowerCase().includes(searchValue) ||
                                       (item.title || '').toLowerCase().includes(searchValue) ||
                                       (item.youtube_title || '').toLowerCase().includes(searchValue);
 
@@ -464,28 +448,28 @@
             });
 
             const filteredByMix = allData.filter(item => {
-                const s = (item.artist || '').toLowerCase().includes(searchValue) || (item.title || '').toLowerCase().includes(searchValue) || (item.youtube_title || '').toLowerCase().includes(searchValue);
+                const s = !searchValue || (item.artist || '').toLowerCase().includes(searchValue) || (item.title || '').toLowerCase().includes(searchValue) || (item.youtube_title || '').toLowerCase().includes(searchValue);
                 const g = !selectedGenre || item.genre === selectedGenre;
                 const y = !selectedYear || item.year === selectedYear;
                 return s && g && y;
             });
 
             const filteredByGenre = allData.filter(item => {
-                const s = (item.artist || '').toLowerCase().includes(searchValue) || (item.title || '').toLowerCase().includes(searchValue) || (item.youtube_title || '').toLowerCase().includes(searchValue);
+                const s = !searchValue || (item.artist || '').toLowerCase().includes(searchValue) || (item.title || '').toLowerCase().includes(searchValue) || (item.youtube_title || '').toLowerCase().includes(searchValue);
                 const m = !selectedMix || item.id_mix === selectedMix || item.mix_name === selectedMix;
                 const y = !selectedYear || item.year === selectedYear;
                 return s && m && y;
             });
 
             const filteredByYear = allData.filter(item => {
-                const s = (item.artist || '').toLowerCase().includes(searchValue) || (item.title || '').toLowerCase().includes(searchValue) || (item.youtube_title || '').toLowerCase().includes(searchValue);
+                const s = !searchValue || (item.artist || '').toLowerCase().includes(searchValue) || (item.title || '').toLowerCase().includes(searchValue) || (item.youtube_title || '').toLowerCase().includes(searchValue);
                 const m = !selectedMix || item.id_mix === selectedMix || item.mix_name === selectedMix;
                 const g = !selectedGenre || item.genre === selectedGenre;
                 return s && m && g;
             });
 
             updateSpecificSelects(filteredByMix, filteredByGenre, filteredByYear);
-            renderTable(filtered);
+            renderResults(filtered, { selectedMix, selectedGenre, selectedYear, searchValue });
         }
 
         function updateSpecificSelects(dataForMix, dataForGenre, dataForYear) {
@@ -525,65 +509,82 @@
             });
         }
 
-        // Fonction de réinitialisation de tous les filtres
         function resetFilters() {
             document.getElementById('search-artist').value = '';
             document.getElementById('select-mix').value = '';
             document.getElementById('select-genre').value = '';
             document.getElementById('select-year').value = '';
             
-            // Remet à jour toutes les listes et réaffiche toutes les données
             updateSelectOptions(allData);
-            renderTable(allData);
+            document.getElementById('results-container').innerHTML = '<div class="no-results">Aucun filtre actif. Veuillez utiliser la recherche ou sélectionner une session, un genre ou une année.</div>';
+            document.getElementById('record-count').textContent = 'Sélectionnez un filtre ou lancez une recherche pour afficher les pistes';
         }
 
-        function renderTable(data) {
-            const tbody = document.querySelector('#catalog-table tbody');
+        function renderResults(data, filters) {
+            const container = document.getElementById('results-container');
             const countDiv = document.getElementById('record-count');
-            tbody.innerHTML = '';
+            container.innerHTML = '';
 
-            countDiv.textContent = `${data.length} row(s) displayed`;
+            countDiv.textContent = `${data.length} track(s) found`;
 
-            data.forEach(item => {
-                const tr = document.createElement('tr');
+            if (data.length === 0) {
+                container.innerHTML = '<div class="no-results">Aucun morceau ne correspond à vos critères.</div>';
+                return;
+            }
 
-                let youtubeLinkHTML = '<span class="no-link">-</span>';
+            let headerTitle = "Résultats de la sélection";
+            if (filters.selectedMix) headerTitle = `Session : ${filters.selectedMix}`;
+            else if (filters.selectedGenre) headerTitle = `Genre : ${filters.selectedGenre}`;
+            else if (filters.selectedYear) headerTitle = `Année : ${filters.selectedYear}`;
+            else if (filters.searchValue) headerTitle = `Recherche : "${filters.searchValue}"`;
+
+            const headerEl = document.createElement('div');
+            headerEl.className = 'results-header';
+            headerEl.textContent = `${headerTitle} (${data.length})`;
+            container.appendChild(headerEl);
+
+            data.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'track-card';
+
+                let youtubeLinkHTML = '<span style="color:#555; font-style:italic;">-</span>';
                 if (item.url_id && item.url_id.trim() !== '') {
-                    youtubeLinkHTML = `<a href="https://www.youtube.com/watch?v=${encodeURIComponent(item.url_id.trim())}" target="_blank" class="yt-link">▶ Show</a>`;
+                    youtubeLinkHTML = `<a href="https://www.youtube.com/watch?v=${encodeURIComponent(item.url_id.trim())}" target="_blank" class="yt-link">▶ Play on YouTube</a>`;
                 }
 
-                tr.innerHTML = `
-                    <td><strong>${item.id_mix || ''}</strong></td>
-                    <td>${item.id_title || ''}</td>
-                    <td>${item.artist || ''}</td>
-                    <td>${item.title || ''}</td>
-                    <td>${item.mix_name || ''}</td>
-                    <td>${item.genre || ''}</td>
-                    <td>${item.youtube_title || ''}</td>
-                    <td>${item.year || ''}</td>
-                    <td>${youtubeLinkHTML}</td>
+                // Format Titre + Nom du mix sur la ligne du haut, Artiste en dessous
+                const trackTitle = item.title || 'Titre inconnu';
+                const mixName = item.mix_name ? ` (${item.mix_name})` : '';
+                const displayTitleMix = `${trackTitle}${mixName}`;
+                const displayArtist = item.artist || 'Artiste inconnu';
+
+                // Condition : On n'affiche PAS la session dans les badges individuels si on filtre déjà par session
+                let metaTagsHTML = '';
+                if (!filters.selectedMix && item.id_mix) {
+                    metaTagsHTML += `<span class="meta-tag">Session: ${item.id_mix}</span>`;
+                }
+                if (!filters.selectedGenre && item.genre) {
+                    metaTagsHTML += `<span class="meta-tag">${item.genre}</span>`;
+                }
+                if (!filters.selectedYear && item.year) {
+                    metaTagsHTML += `<span class="meta-tag">${item.year}</span>`;
+                }
+
+                card.innerHTML = `
+                    <div class="track-main">
+                        <div class="track-num">${item.id_title || (index + 1)}</div>
+                        <div class="track-info">
+                            <div class="track-title-mix">${displayTitleMix}</div>
+                            <div class="track-artist">${displayArtist}</div>
+                        </div>
+                    </div>
+                    <div class="track-meta">
+                        ${metaTagsHTML}
+                        ${youtubeLinkHTML}
+                    </div>
                 `;
-                tbody.appendChild(tr);
+                container.appendChild(card);
             });
-        }
-
-        let sortDirection = false;
-        function sortTable(columnIndex) {
-            const keys = ['id_mix', 'id_title', 'artist', 'title', 'mix_name', 'genre', 'youtube_title', 'year'];
-            const key = keys[columnIndex];
-
-            sortDirection = !sortDirection;
-            allData.sort((a, b) => {
-                let valA = a[key] || '';
-                let valB = b[key] || '';
-
-                if (!isNaN(valA) && !isNaN(valB) && valA !== '' && valB !== '') {
-                    return sortDirection ? valA - valB : valB - valA;
-                }
-                return sortDirection ? valA.localeCompare(valB) : valB.localeCompare(valA);
-            });
-
-            applyFilters();
         }
 
         window.onload = initCatalog;

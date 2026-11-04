@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -107,7 +107,7 @@
             color: var(--accent-color);
         }
 
-        /* --- STYLE TYPE BEATPORT TRACKLIST --- */
+        /* --- BEATPORT STYLE TRACKLIST --- */
         .results-container {
             display: flex;
             flex-direction: column;
@@ -207,7 +207,7 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Session cliquable */
+        /* Clickable session tag */
         .meta-tag-clickable {
             background: #252525;
             padding: 4px 8px;
@@ -270,7 +270,7 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Responsive Mobile */
+        /* Mobile Responsive */
         @media (max-width: 768px) {
             .controls {
                 flex-direction: column;
@@ -301,9 +301,9 @@
 </head>
 <body>
 
-    <h1>🎧 MXH Sessions Catalog - (ver. 0.8)</h1>
+    <h1>🎧 MXH Sessions Catalog - (ver. 1.0)</h1>
 
-    <!-- BARRE DE RECHERCHE ET FILTRES -->
+    <!-- SEARCH & FILTER CONTROLS -->
     <div class="controls">
         <div class="control-group">
             <label for="search-artist">Search by Artist / Title:</label>
@@ -330,13 +330,13 @@
         <button class="btn-reset" onclick="resetFilters()">Reset</button>
     </div>
 
-    <!-- ZONE DE STATISTIQUES GLOBALES -->
+    <!-- GLOBAL STATS DISPLAY -->
     <div class="stats">
         <div id="catalog-global-stats">Global: Loading...</div>
         <div id="record-count">Select a filter or perform a search to display the tracks</div>
     </div>
 
-    <!-- CONTENEUR DES RÉSULTATS -->
+    <!-- RESULTS CONTAINER -->
     <div id="results-container" class="results-container">
         <div class="no-results">No active filters. Please use the search function or select a session, genre, or year.</div>
     </div>
@@ -347,7 +347,7 @@
         async function initCatalog() {
             try {
                 const response = await fetch('mixes.csv');
-                if (!response.ok) throw new Error("Fichier introuvable");
+                if (!response.ok) throw new Error("File not found");
                 
                 const buffer = await response.arrayBuffer();
                 const decoder = new TextDecoder('iso-8859-1');
@@ -375,8 +375,8 @@
                 document.getElementById('select-year').addEventListener('change', applyFilters);
 
             } catch (err) {
-                console.error("Erreur lors du chargement de mixes.csv :", err);
-                document.getElementById('record-count').textContent = "Erreur de chargement. Vérifiez votre serveur local HTTP.";
+                console.error("Error loading mixes.csv:", err);
+                document.getElementById('record-count').textContent = "Loading error. Please check your local HTTP server.";
             }
         }
 
@@ -424,6 +424,26 @@
             return result.map(val => val.trim().replace(/^"(.*)"$/, '$1').replace(/""/g, '"'));
         }
 
+        // Converts timecode ("00:00", "03:45", "01:02:10") or raw seconds to total seconds
+        function parseTimecodeToSeconds(tc) {
+            if (tc === null || tc === undefined) return null;
+            const str = tc.toString().trim();
+            if (str === '') return null;
+            if (!isNaN(str)) return parseInt(str, 10);
+
+            const parts = str.split(':').map(p => parseInt(p, 10));
+            if (parts.some(isNaN)) return null;
+
+            if (parts.length === 3) {
+                return parts[0] * 3600 + parts[1] * 60 + parts[2];
+            } else if (parts.length === 2) {
+                return parts[0] * 60 + parts[1];
+            } else if (parts.length === 1) {
+                return parts[0];
+            }
+            return null;
+        }
+
         function updateSelectOptions(currentFilteredData) {
             const mixSelect = document.getElementById('select-mix');
             const genreSelect = document.getElementById('select-genre');
@@ -462,9 +482,7 @@
             });
         }
 
-        // Fonction pour activer directement le filtre d'une session donnée
         function selectSession(sessionName) {
-            // Réinitialise la recherche texte pour voir l'intégralité de la session
             document.getElementById('search-artist').value = '';
             document.getElementById('select-mix').value = sessionName;
             document.getElementById('select-genre').value = '';
@@ -482,8 +500,8 @@
             const countDiv = document.getElementById('record-count');
 
             if (!searchValue && !selectedMix && !selectedGenre && !selectedYear) {
-                container.innerHTML = '<div class="no-results">Aucun filtre actif. Veuillez utiliser la recherche ou sélectionner une session, un genre ou une année.</div>';
-                countDiv.textContent = 'Sélectionnez un filtre ou lancez une recherche pour afficher les pistes';
+                container.innerHTML = '<div class="no-results">No active filters. Please use the search function or select a session, genre, or year.</div>';
+                countDiv.textContent = 'Select a filter or perform a search to display the tracks';
                 updateSelectOptions(allData);
                 return;
             }
@@ -570,8 +588,8 @@
             document.getElementById('select-year').value = '';
             
             updateSelectOptions(allData);
-            document.getElementById('results-container').innerHTML = '<div class="no-results">Aucun filtre actif. Veuillez utiliser la recherche ou sélectionner une session, un genre ou une année.</div>';
-            document.getElementById('record-count').textContent = 'Sélectionnez un filtre ou lancez une recherche pour afficher les pistes';
+            document.getElementById('results-container').innerHTML = '<div class="no-results">No active filters. Please use the search function or select a session, genre, or year.</div>';
+            document.getElementById('record-count').textContent = 'Select a filter or perform a search to display the tracks';
         }
 
         function renderResults(data, filters) {
@@ -582,15 +600,15 @@
             countDiv.textContent = `${data.length} track(s) found`;
 
             if (data.length === 0) {
-                container.innerHTML = '<div class="no-results">Aucun morceau ne correspond à vos critères.</div>';
+                container.innerHTML = '<div class="no-results">No tracks match your criteria.</div>';
                 return;
             }
 
-            let headerTitle = "Résultats de la sélection";
-            if (filters.selectedMix) headerTitle = `Session : ${filters.selectedMix}`;
-            else if (filters.selectedGenre) headerTitle = `Genre : ${filters.selectedGenre}`;
-            else if (filters.selectedYear) headerTitle = `Année : ${filters.selectedYear}`;
-            else if (filters.searchValue) headerTitle = `Recherche : "${filters.searchValue}"`;
+            let headerTitle = "Selection Results";
+            if (filters.selectedMix) headerTitle = `Session: ${filters.selectedMix}`;
+            else if (filters.selectedGenre) headerTitle = `Genre: ${filters.selectedGenre}`;
+            else if (filters.selectedYear) headerTitle = `Year: ${filters.selectedYear}`;
+            else if (filters.searchValue) headerTitle = `Search: "${filters.searchValue}"`;
 
             const headerEl = document.createElement('div');
             headerEl.className = 'results-header';
@@ -613,27 +631,25 @@
                 const beatportQuery = encodeURIComponent(`${item.artist || ''} ${item.title || ''}`.trim());
                 const beatportLinkHTML = `<a href="https://www.beatport.com/search?q=${beatportQuery}" target="_blank" class="bp-link">▶ Play on Beatport</a>`;
 
-                let actionsHTML = '';
-                if (filters.selectedMix) {
-                    actionsHTML = beatportLinkHTML;
-                } else {
-                    let youtubeLinkHTML = '<span style="color:#555; font-style:italic;">-</span>';
-                    if (item.url_id && item.url_id.trim() !== '') {
-                        youtubeLinkHTML = `<a href="https://www.youtube.com/watch?v=${encodeURIComponent(item.url_id.trim())}" target="_blank" class="yt-link">▶ Play on YouTube</a>`;
-                    }
-                    actionsHTML = `${youtubeLinkHTML} ${beatportLinkHTML}`;
+                let youtubeLinkHTML = '';
+                const seconds = parseTimecodeToSeconds(item.timecode);
+                
+                if (item.url_id && item.url_id.trim() !== '' && seconds !== null) {
+                    const ytUrl = `https://www.youtube.com/watch?v=${encodeURIComponent(item.url_id.trim())}&t=${seconds}s`;
+                    youtubeLinkHTML = `<a href="${ytUrl}" target="_blank" class="yt-link">▶ Play on YouTube</a>`;
                 }
 
-                const trackTitle = item.title || 'Titre inconnu';
+                const actionsHTML = `${youtubeLinkHTML} ${beatportLinkHTML}`;
+
+                const trackTitle = item.title || 'Unknown Title';
                 const mixName = item.mix_name ? ` (${item.mix_name})` : '';
                 const displayTitleMix = `${trackTitle}${mixName}`;
-                const displayArtist = item.artist || 'Artiste inconnu';
+                const displayArtist = item.artist || 'Unknown Artist';
 
                 let metaTagsHTML = '';
-                // Badge de Session cliquable uniquement si on n'est pas déjà en mode sélection de session
                 if (!filters.selectedMix && item.id_mix) {
                     const sessionVal = item.id_mix;
-                    metaTagsHTML += `<span class="meta-tag-clickable" onclick="selectSession('${sessionVal}')" title="Filtrer sur cette session">Session: ${sessionVal}</span>`;
+                    metaTagsHTML += `<span class="meta-tag-clickable" onclick="selectSession('${sessionVal}')" title="Filter by this session">Session: ${sessionVal}</span>`;
                 }
                 if (!filters.selectedGenre && item.genre) {
                     metaTagsHTML += `<span class="meta-tag">${item.genre}</span>`;

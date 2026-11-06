@@ -605,7 +605,11 @@
             }
 
             let headerTitle = "Selection Results";
-            if (filters.selectedMix) headerTitle = `Session: ${filters.selectedMix}`;
+            if (filters.selectedMix) {
+                const sessionItem = data.find(i => i.youtube_title && i.youtube_title.trim() !== '');
+                const mixDisplayName = sessionItem ? sessionItem.youtube_title : filters.selectedMix;
+                headerTitle = `Session: ${mixDisplayName}`;
+            }
             else if (filters.selectedGenre) headerTitle = `Genre: ${filters.selectedGenre}`;
             else if (filters.selectedYear) headerTitle = `Year: ${filters.selectedYear}`;
             else if (filters.searchValue) headerTitle = `Search: "${filters.searchValue}"`;
